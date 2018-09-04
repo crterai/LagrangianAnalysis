@@ -18,6 +18,7 @@ import numpy as np
 from durolib import globalAttWrite,writeToLog,trimModelList
 from socket import gethostname
 
+"""
 def CLDTOP_NdTCLDTOT(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,optionType='SP')
         mv_time=SPNC.getTime()
         mv_lat=SPNC.getAxis(2)
@@ -80,11 +81,28 @@ def CLDTOP_NdTCLDTOT(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,optionType='SP')
         CLDTOPZ3_var.long_name='Cloud top height'
         CLDTOPT_var.long_name='Cloud top temperature'
         return CLDTOPSPNC_var,CLDTOPT_var,CLDTOPZ3_var,CLDTOT_var,TGCLDLWP_var
-
+"""
 def Entrainingq_Radiativeq(Q,P,Theta):
         #Calculates the Q at the entrainment layer and the Q above that, but below 700 hPa
 
         return EntrainingQ,RadiativeQ
+
+def create_P(ps,a,b,p0):
+        P=cdu.reconstructPressureFromHybrid(ps,a,b,p0)
+        return P
+
+def Winds_hPa(U,V,P,pressurelevel):
+        # Calculates and creates a file with pressurelevel hPa winds
+        pressurelevel_pascal=pressurelevel*100.
+        U_hPa=cdu.logLinearInterpolation(U,P,levels=pressurelevel_pascal)
+        U_hPa.long_name=''.join(['U at ',str(pressurelevel),'hPa'])
+        U_hPa.id='U'
+        U_hPa.notes='U manipulated by cdutils.logLinearInterpolation'
+        V_hPa=cdu.logLinearInterpolation(V,P,levels=pressurelevel_pascal)
+        V_hPa.long_name=''.join(['V at ',str(pressurelevel),'hPa'])
+        V_hPa.notes='V manipulated by cdutils.logLinearInterpolation'
+        V_hPa.id='V'
+        return U_hPa,V_hPa
 
 def EIS_LTS(Theta,P,RELHUM):
         #Calculates the Lower Tropospheric Stability (LTS) and Estimated Inversion Strenght (EIS)
