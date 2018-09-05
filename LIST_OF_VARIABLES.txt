@@ -1,0 +1,14 @@
+# Lists out the variables needed to accomplish the analysis
+
+
+Variables with an hourly output frequency
+Local time
+Total cloud cover
+Height-resolved cloud cover
+LWP
+SST
+Height-resolved temperature and humidity (for estimating inversion height and strength)
+Height-resolved vertical velocity (omega)
+Lower troposphere horizontal winds (or at the surface?)
+Surface precipitation rate (do I need something more height resolved?)
+Cloud droplet number concentration (to retrieve cloud top Nd)

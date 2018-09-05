@@ -22,6 +22,7 @@ Analyze the before and after
 
 
 The list of files are brief descriptions follow below:
+LIST_OF_VARIABLES.txt - includes a list of variables needed for the analysis
 trajectories.py - calculates trajectories of the boxes based on gridded U and V fields
 createboxes.py - creates boxes that fall within the study area (lat0,lon0,lat1,lon1) and determines which time snapshot to initialize the boxes based on the mean latitude and longitude
 calc_anomalies.py - calculates the anomalies of a field with respect to 100 day running mean at each grid box
