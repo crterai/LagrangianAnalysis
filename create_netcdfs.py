@@ -48,7 +48,7 @@ def add_scriptname(f_out):
     setattr(f_out,'script_used',filename)
     return f_out
 
-def return_git_hash:
+def return_git_hash():
     """
     Returns the git hash of the current commit
     """
