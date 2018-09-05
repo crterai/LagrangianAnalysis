@@ -53,16 +53,10 @@ for i in months: #np.arange(4):
             outfile=''.join([derived_output_location,'LTS_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
             f_out=cdm.open(outfile,'w')
             
-            att_keys = f_in1.attributes.keys()
-            att_dic = {}
-            for i in range(len(att_keys)):
-                att_dic[i]=att_keys[i],f_in1.attributes[att_keys[i]]
-                to_out = att_dic[i]
-            setattr(f_out,to_out[0],to_out[1])
-            setattr(f_out,'comments2','Used create_variable.EIS_LTS to create wind output')
             globalAttWrite(f_out,options=None) ; # Use function to write standard global atts to output file
             f_out.write(LTS)
-            f_out=create_netcdfs.add_git_has(f_out)
+            f_out=create_netcdfs.transfer_attributes(f_in1,f_out)
+            f_out=create_netcdfs.add_git_hash(f_out)
             f_out=create_netcdfs.add_scriptname(f_out)
             f_in1.close()
             f_out.close()
