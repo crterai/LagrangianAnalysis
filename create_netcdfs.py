@@ -39,7 +39,7 @@ def add_git_hash(f_out):
     setattr(f_out,'git_hash',label)
     return f_out
 
-def add_filename(f_out):
+def add_scriptname(f_out):
     """
     Adds the name of the script that is used to create the output in the global
     attributes of the file

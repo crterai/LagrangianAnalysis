@@ -18,12 +18,14 @@ import numpy as np
 from durolib import globalAttWrite,writeToLog,trimModelList
 from socket import gethostname
 import create_variables
+import create_netcdfs
 
 model_output_location='/global/cscratch1/sd/terai/UP/archive/longcam5I_L30_20081001_00Z_f09_g16_1024/atm/hist/'
 model_prefix='longcam5I_L30_20081001_00Z_f09_g16_1024'
 derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
 year='2009'
-months=['01','02','03','04','05','06','07','08','09']
+#months=['01','02','03','04','05','06','07','08','09']
+months=['06','07','08','09']
 datestr=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
 timestr=['00000','21600','43200','64800']
 
@@ -31,23 +33,24 @@ for i in months: #np.arange(4):
     mo_date=i
     print i
     for j in datestr:
+        print j
         date=j
         for k in timestr:
             time=k
             try:
                 f_in1=cdm.open("".join([model_output_location,model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc']))
             except:
-                print ''.join(['Tried for',i,'-',j,'-',k,': moving on'])
+                print ''.join(['Tried for',mo_date,'-',date,'-',time,': moving on'])
                 continue
-            U=f_in1('U')
-            V=f_in1('V')
+            T=f_in1('T')
+            RELHUM=T
             p0=f_in1('P0')
             a=f_in1('hyam')
             b=f_in1('hybm')
             ps=f_in1('PS')
             P=create_variables.create_P(ps,a,b,p0)
-            U_hPa,V_hPa=create_variables.Winds_hPa(U,V,P,925)
-            outfile=''.join([derived_output_location,'Winds_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
+            LTS,EIS=create_variables.EIS_LTS(T,P,RELHUM)
+            outfile=''.join([derived_output_location,'LTS_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
             f_out=cdm.open(outfile,'w')
             
             att_keys = f_in1.attributes.keys()
@@ -56,9 +59,10 @@ for i in months: #np.arange(4):
                 att_dic[i]=att_keys[i],f_in1.attributes[att_keys[i]]
                 to_out = att_dic[i]
             setattr(f_out,to_out[0],to_out[1])
-            setattr(f_out,'comments2','Used create_variable.Winds_hPa to create wind output')
+            setattr(f_out,'comments2','Used create_variable.EIS_LTS to create wind output')
             globalAttWrite(f_out,options=None) ; # Use function to write standard global atts to output file
-            f_out.write(U_hPa)
-            f_out.write(V_hPa)
+            f_out.write(LTS)
+            f_out=create_netcdfs.add_git_has(f_out)
+            f_out=create_netcdfs.add_scriptname(f_out)
             f_in1.close()
             f_out.close()
