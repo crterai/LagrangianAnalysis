@@ -15,11 +15,10 @@ import glob
 import os
 from string import replace
 import numpy as np
-from durolib import globalAttWrite,writeToLog,trimModelList
 from socket import gethostname
 import subprocess
 
-def transfer_attributes(f_in,f_out)
+def transfer_attributes(f_in,f_out):
     """
     f_in and f_out point to netcdfs
     This function transfers the netcdf attributes from f_in to f_out
@@ -32,7 +31,7 @@ def transfer_attributes(f_in,f_out)
     setattr(f_out,to_out[0],to_out[1])
     return f_out
 
-def add_git_hash(f_out)
+def add_git_hash(f_out):
     """
     Adds the git hash (version of the code) to the f_out
     """
@@ -40,11 +39,18 @@ def add_git_hash(f_out)
     setattr(f_out,'git_hash',label)
     return f_out
 
-def return_git_hash
+def add_filename(f_out):
+    """
+    Adds the name of the script that is used to create the output in the global
+    attributes of the file
+    """
+    filename=os.path.basename(__file__)
+    setattr(f_out,'script_used',filename)
+    return f_out
+
+def return_git_hash:
     """
     Returns the git hash of the current commit
     """
     label = subprocess.check_output(["git", "describe","--always"]).strip()
     return label
-
-    
