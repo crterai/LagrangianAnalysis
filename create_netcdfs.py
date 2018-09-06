@@ -23,10 +23,10 @@ def transfer_attributes(f_in,f_out):
     f_in and f_out point to netcdfs
     This function transfers the netcdf attributes from f_in to f_out
     """
-    att_keys = f_in1.attributes.keys()
+    att_keys = f_in.attributes.keys()
     att_dic = {}
     for i in range(len(att_keys)):
-        att_dic[i]=att_keys[i],f_in1.attributes[att_keys[i]]
+        att_dic[i]=att_keys[i],f_in.attributes[att_keys[i]]
         to_out = att_dic[i]
     setattr(f_out,to_out[0],to_out[1])
     return f_out
