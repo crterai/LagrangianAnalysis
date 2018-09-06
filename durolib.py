@@ -287,7 +287,7 @@ def globalAttWrite(file_handle,options):
     file_handle.institution     = "Department of Earth System Science, UC-Irvine"
     file_handle.data_contact    = "Chris Terai; rterai@uci.edu"
     file_handle.history         = "".join(['File processed: ',time_format,' UTC; Irvine, CA, USA'])
-    file_handle.host            = "".join([gethostname(),'; UVCDAT version: ',".".join(["%s" % el for el in cdat_info.version()]),
+    file_handle.analysis_host            = "".join([gethostname(),'; UVCDAT version: ',".".join(["%s" % el for el in cdat_info.version()]),
                                            '; Python version: ',replace(replace(sys.version,'\n','; '),') ;',');')])
 
 def inpaint(array,method):

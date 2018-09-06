@@ -18,8 +18,10 @@ import numpy as np
 from durolib import globalAttWrite,writeToLog,trimModelList
 from socket import gethostname
 
-"""
-def CLDTOP_NdTCLDTOT(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,optionType='SP')
+def CLDTOP_NdTCLDTOT_CAM5(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,CLDTOT):
+        cltop_idxmax=10
+        cltop_idxmin=29
+        
         mv_time=SPNC.getTime()
         mv_lat=SPNC.getAxis(2)
         mv_lon=SPNC.getAxis(3)
@@ -38,7 +40,7 @@ def CLDTOP_NdTCLDTOT(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,optionType='SP')
         TGCLDLWP=np.array(TGCLDLWP)
         T=np.array(T)
 
-        CLDTOP_int=np.ceil(CLDTOP)+1
+        CLDTOP_int=np.ceil(CLDTOP)
         CLDTOPSPNC=np.zeros(CLDTOP.shape)
         CLDTOPZ3=np.zeros(CLDTOP.shape)
         CLDTOPT=np.zeros(CLDTOP.shape)
@@ -50,11 +52,8 @@ def CLDTOP_NdTCLDTOT(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,optionType='SP')
                         Cltop_index=np.int(CLDTOP_int[t,x,y])
                         CloudTOT=np.squeeze(CLDTOT[t,x,y])
                         CloudyLWP=TGCLDLWP[t,x,y]/CloudTOT
-                        if (CloudyLWP>0.005 and Cltop_index>cltop_idxmax and Cltop_index<cltop_idxmin and CloudTOT>0.0 and CLOUD[t,Cltop_index,x,y]>0.0):  #set Cltop_index>34 for UPCAM
-                            if (optionType == 'SP'):
-                                CLDTOPSPNC[t,x,y]=SPNC[t,Cltop_index,x,y]/CLOUD[t,Cltop_index,x,y]
-                            else:
-                                CLDTOPSPNC[t,x,y]=SPNC[t,Cltop_index,x,y]
+                        if (CloudyLWP>0.005 and Cltop_index>cltop_idxmax and Cltop_index<=cltop_idxmin and CloudTOT>0.0 and CLOUD[t,Cltop_index,x,y]>0.0):  #set Cltop_index>34 for UPCAM
+                            CLDTOPSPNC[t,x,y]=SPNC[t,Cltop_index,x,y]
                             CLDTOPZ3[t,x,y]=Z3[t,Cltop_index,x,y]
                             CLDTOPT[t,x,y]=T[t,Cltop_index,x,y]
                         else:
@@ -81,7 +80,7 @@ def CLDTOP_NdTCLDTOT(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,optionType='SP')
         CLDTOPZ3_var.long_name='Cloud top height'
         CLDTOPT_var.long_name='Cloud top temperature'
         return CLDTOPSPNC_var,CLDTOPT_var,CLDTOPZ3_var,CLDTOT_var,TGCLDLWP_var
-"""
+
 def Entrainingq_Radiativeq(Q,P,Theta):
         #Calculates the Q at the entrainment layer and the Q above that, but below 700 hPa
 
@@ -104,8 +103,18 @@ def Winds_hPa(U,V,P,pressurelevel):
         V_hPa.id='V'
         return U_hPa,V_hPa
 
-def EIS_LTS(Theta,P,RELHUM):
+def EIS_LTS(T,P,RELHUM):
         #Calculates the Lower Tropospheric Stability (LTS) and Estimated Inversion Strenght (EIS)
+        Theta_700=cdu.logLinearInterpolation(T,P,levels=70000)*(1000./750.)**(2./7.)
+        Theta_700=cdu.averager(Theta_700,axis='z')
+        Theta_1000=cdu.logLinearInterpolation(T,P,levels=100000)
+        Theta_1000=cdu.averager(Theta_1000,axis='z')
+        LTS=Theta_700-Theta_1000
+        LTS.id='LTS'
+        LTS.long_name='Lower tropospheric stability'
+        LTS.units='K'
+        # !!! Still need to develop EIS !!!
+        EIS=LTS
         return LTS,EIS
 
 def BLH(P,Theta,Z3):
