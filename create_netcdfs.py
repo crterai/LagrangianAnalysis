@@ -28,7 +28,7 @@ def transfer_attributes(f_in,f_out):
     for i in range(len(att_keys)):
         att_dic[i]=att_keys[i],f_in.attributes[att_keys[i]]
         to_out = att_dic[i]
-    setattr(f_out,to_out[0],to_out[1])
+        setattr(f_out,to_out[0],to_out[1])
     return f_out
 
 def add_git_hash(f_out):
