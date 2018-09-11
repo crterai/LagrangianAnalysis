@@ -46,8 +46,8 @@ for i in months: #np.arange(4):
                 continue
             var1=f_in1('U',time=slice(0,1))
             var2=f_in1('V',time=slice(0,1))
-            var1_regrid=var1.regrid(gpcp_grid,regridTool='esmf',regridMethod='conserve')
-            var2_regrid=var2.regrid(gpcp_grid,regridTool='esmf',regridMethod='conserve')
+            var1_regrid=var1.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+            var2_regrid=var2.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
             var1_regrid=create_netcdfs.transfer_attributes(var1,var1_regrid)
             var2_regrid=create_netcdfs.transfer_attributes(var2,var2_regrid)
             var1_regrid.notes="".join(["Regridded data to 1degx1deg with regrid_variables.py",var1_regrid.notes])
@@ -59,7 +59,7 @@ for i in months: #np.arange(4):
             f_out.write(var1_regrid)
             f_out.write(var2_regrid)
             f_out=create_netcdfs.transfer_attributes(f_in1,f_out)
-            globalAttWrite(f_out,options=None) ; # Use function to write standard global atts to output file
+            f_out=create_netcdfs.globalAttWrite(f_out) ; # Use function to write standard global atts to output file
             setattr(f_out,'script_URL','https://github.com/crterai/Analysis/commit/')
             f_out=create_netcdfs.add_git_hash(f_out)
             filename=os.path.basename(__file__)
