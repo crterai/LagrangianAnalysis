@@ -66,6 +66,7 @@ def globalAttWrite(file_handle):
 
 def transfer_attributes(f_in,f_out):
     """
+    f_out = transfer_attributes(f_in,f_out)
     f_in and f_out point to netcdfs
     This function transfers the netcdf attributes from f_in to f_out
     """
