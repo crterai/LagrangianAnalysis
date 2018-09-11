@@ -11,7 +11,7 @@ import glob
 import os
 from string import replace
 import numpy as np
-from durolib import globalAttWrite,writeToLog,trimModelList
+#from durolib import globalAttWrite,writeToLog,trimModelList
 from socket import gethostname
 import create_variables
 import create_netcdfs
@@ -40,7 +40,7 @@ for i in months: #np.arange(4):
         for k in timestr:
             time=k
             try:
-                f_in1=cdm.open("".join(['Winds_',model_output_location,model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc']))
+                f_in1=cdm.open("".join([model_output_location,'Winds_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc']))
             except:
                 print ''.join(['Tried for',mo_date,'-',date,'-',time,': moving on'])
                 continue

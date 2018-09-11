@@ -8,10 +8,10 @@ Many functions in this libary attach meta-data onto netcdf files.
 Tested on python-2.7 with UVCDAT.
 """
 
-import argparse,datetime,gc,re,sys,time
-#import cdms2 as cdm
-#import MV2 as MV     #stuff for dealing with masked values.
-#import cdutil as cdu
+import cdat_info,cdtime,code,datetime,gc,inspect,os,pytz,re,string,sys
+import cdms2 as cdm
+import MV2 as MV     #stuff for dealing with masked values.
+import cdutil as cdu
 import glob
 import os
 from string import replace
