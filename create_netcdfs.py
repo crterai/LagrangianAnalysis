@@ -60,8 +60,8 @@ def globalAttWrite(file_handle):
     setattr(file_handle,'institution',"Department of Earth System Science, UC-Irvine")
     setattr(file_handle,'data_contact',"Chris Terai; rterai@uci.edu")
     setattr(file_handle,'history',"".join(['File processed: ',time_format,' UTC; Irvine, CA, USA']))
-    setattr(file_handle,'analysis_host',"".join([gethostname(),'; UVCDAT version: ',".".join(["%s" % el for el in cdat_info.version()]), \
-                                           '; Python version: ',replace(replace(sys.version,'\n','; '),') ;',');')])
+    #setattr(file_handle,'analysis_host',"".join([gethostname(),'; UVCDAT version: ',".".join(["%s" % el for el in cdat_info.version()]), \
+    #                                       '; Python version: ',replace(replace(sys.version)),') ;',')'])
     return file_handle
 
 def transfer_attributes(f_in,f_out):
