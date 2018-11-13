@@ -19,7 +19,7 @@ from durolib import globalAttWrite,writeToLog,trimModelList
 from socket import gethostname
 
 def CLDTOP_NdTCLDTOT_CAM5(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,CLDTOT):
-        cltop_idxmax=10
+        cltop_idxmax=4
         cltop_idxmin=29
         
         mv_time=SPNC.getTime()
@@ -52,7 +52,7 @@ def CLDTOP_NdTCLDTOT_CAM5(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,CLDTOT):
                         Cltop_index=np.int(CLDTOP_int[t,x,y])
                         CloudTOT=np.squeeze(CLDTOT[t,x,y])
                         CloudyLWP=TGCLDLWP[t,x,y]/CloudTOT
-                        if (CloudyLWP>0.005 and Cltop_index>cltop_idxmax and Cltop_index<=cltop_idxmin and CloudTOT>0.0 and CLOUD[t,Cltop_index,x,y]>0.0):  #set Cltop_index>34 for UPCAM
+                        if (CloudyLWP>0.00005 and Cltop_index>cltop_idxmax and Cltop_index<=cltop_idxmin and CloudTOT>0.0 and CLOUD[t,Cltop_index,x,y]>0.0):  #set Cltop_index>34 for UPCAM
                             CLDTOPSPNC[t,x,y]=SPNC[t,Cltop_index,x,y]
                             CLDTOPZ3[t,x,y]=Z3[t,Cltop_index,x,y]
                             CLDTOPT[t,x,y]=T[t,Cltop_index,x,y]
