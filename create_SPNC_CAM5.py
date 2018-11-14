@@ -23,8 +23,8 @@ model_output_location='/global/cscratch1/sd/terai/UP/archive/longcam5I_L30_20081
 model_prefix='longcam5I_L30_20081001_00Z_f09_g16_1024'
 derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
 year='2009'
-#months=['01','02','03','04','05','06','07','08','09']
-months=['09']
+months=['04','05','06','07','08','09','10','11','12']
+#months=['09']
 #datestr=['20','21','22','23','24','25','26','27','28','29','30','31']
 datestr=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
 timestr=['00000','21600','43200','64800']
@@ -51,7 +51,7 @@ for i in months: #np.arange(4):
             SPNC=f_in2('ICWNC')
             CLOUD=f_in1('CLOUD')
             cldtopspnc,cldtopt,cldtopz3,cldtot,tgcldlwp=create_variables.CLDTOP_NdTCLDTOT_CAM5(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,CLDTOT)
-            outfile=''.join([derived_output_location,'CloudTop_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
+            outfile=''.join([derived_output_location,'CloudTopv2_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
             f_out=cdm.open(outfile,'w')
             
             att_keys = f_in1.attributes.keys()
@@ -61,6 +61,7 @@ for i in months: #np.arange(4):
                 to_out = att_dic[i]
             setattr(f_out,to_out[0],to_out[1])
             setattr(f_out,'comments2','Used create_variable.CLDTOP_NdTCLDTOT_CAM5 to create cloud output')
+            setattr(f_out,'comments3','Updated create_variable.CLDTOP_NdTCLDTOT_CAM5 to relax output')
             globalAttWrite(f_out,options=None) ; # Use function to write standard global atts to output file
             f_out.write(cldtopspnc)
             f_out.write(cldtopz3)
