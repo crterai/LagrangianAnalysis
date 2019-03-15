@@ -114,11 +114,35 @@ def match_traj_parallelized_general(Start_index,End_index):
                     CltopZ3_array=np.nan
                 if CltopSPNC_array<0.0001:
                     CltopSPNC_array=np.nan
+
+                # ********  Repeat the steps above for the 100-day mean data
+                f_CloudTop_100dm=cdm.open(''.join([filelocation,'AVG100days_CloudTopv2_',fileprefix,str_time,'.nc']))
+                # Take the time slice and box with 5 x 5 deg. around interested area
+                LWP_grid_100dm=f_CloudTop_100dm('TGCLDLWP',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                CLDTOT_grid_100dm=f_CloudTop_100dm('CLDTOT',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                CltopZ3_grid_100dm=f_CloudTop_100dm('CltopZ3',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                CltopSPNC_grid_100dm=f_CloudTop_100dm('CltopSPNC',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                # Regrid the data to 1x1 deg boxes using the grid from GPCP (see above)
+                LWP_regridded_100dm=LWP_grid_100dm.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+                CLDTOT_regridded_100dm=CLDTOT_grid_100dm.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+                CltopZ3_regridded_100dm=CltopZ3_grid_100dm.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+                CltopSPNC_regridded_100dm=CltopSPNC_grid_100dm.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+                # Take the value from the grid box that lies within 1deg box around the point
+                LWP_100dm=LWP_regridded_100dm(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                CLDTOT_100dm=CLDTOT_regridded_100dm(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                CltopZ3_100dm=CltopZ3_regridded_100dm(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                CltopSPNC_100dm=CltopSPNC_regridded_100dm(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                LWP_array_100dm=np.array(cdu.averager(LWP_100dm,axis='xyt'))
+                CLDTOT_array_100dm=np.array(cdu.averager(CLDTOT_100dm,axis='xyt'))
+                CltopZ3_array_100dm=np.array(cdu.averager(CltopZ3_100dm,axis='xyt'))
+                CltopSPNC_array_100dm=np.array(cdu.averager(CltopSPNC_100dm,axis='xyt'))
+                # **************************************************************
+
                 # Enter values into the new output table
-                Output_table[i-start_index,j+1]=CLDTOT_array
-                Output_table[i-start_index,j+8]=LWP_array
-                Output_table[i-start_index,j+15]=CltopZ3_array
-                Output_table[i-start_index,j+22]=CltopSPNC_array
+                Output_table[i-start_index,j+1]=CLDTOT_array-CLDTOT_array_100dm
+                Output_table[i-start_index,j+8]=LWP_array-LWP_array_100dm
+                Output_table[i-start_index,j+15]=CltopZ3_array-CltopZ3_array_100dm
+                Output_table[i-start_index,j+22]=CltopSPNC_array-CltopSPNC_array_100dm
         np.set_printoptions(precision=5)
         # Save the table into a text file with 6 significant digits
         np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectory_CLDTOT_LWP_Cltop_Nc_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')

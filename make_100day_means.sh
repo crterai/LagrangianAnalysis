@@ -25,13 +25,13 @@ do
       ALLFILES=($(ls ${1}_*.nc))
       #ALLFILESarray = ($ALLFILES)
       indexi=0
-            while [ $indexi -lt 315 ] 
+            while [ $indexi -lt 265 ] 
             do
                 i50=50+indexi
                 file50=${ALLFILES[${i50}]}
                 #echo $file50
                 i100=99+indexi
-                filestoanalyze=${ALLFILES[@]:${i}:${i100}}
+                filestoanalyze=${ALLFILES[@]:${indexi}:${i100}}
                 nces $filestoanalyze AVG100days_${file50} 
                 (( indexi++ ))
             done

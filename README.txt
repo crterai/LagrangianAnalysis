@@ -11,10 +11,12 @@ Initializing boxes
 1) Determine boxes that fall within study area -- 
 2) Determine snapshots 0130 or 1330 local time
 3) Create boxes to track forward
+This set of operations are done by Ryan Eastman.
 
 Running trajectories
 1) Read in U,V @ 925 hPa every Xhrs and push boxes forward
 2) Locate box after 24hrs
+This set is also done by Ryan Eastman.
 
 Analyze the before and after 
 1)Calculate anomalies with respect to 100 day running mean at each grid box -- analysis_lib.py

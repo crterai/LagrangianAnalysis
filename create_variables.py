@@ -90,6 +90,17 @@ def create_P(ps,a,b,p0):
         P=cdu.reconstructPressureFromHybrid(ps,a,b,p0)
         return P
 
+def Variable_hPa(var,P,pressurelevel):
+        # Calculates and creates a file with pressurelevel hPa winds
+        pressurelevel_pascal=pressurelevel*100.
+        var_hPa=cdu.logLinearInterpolation(var,P,levels=pressurelevel_pascal)
+        var_id=var.id
+        var_hPa.long_name=''.join([var_id,' at ',str(pressurelevel),'hPa'])
+        var_hPa.id=var_id
+        var_hPa.notes=''.join([var_id,' manipulated by cdutils.logLinearInterpolation'])
+        return var_hPa
+
+
 def Winds_hPa(U,V,P,pressurelevel):
         # Calculates and creates a file with pressurelevel hPa winds
         pressurelevel_pascal=pressurelevel*100.

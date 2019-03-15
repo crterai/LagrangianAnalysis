@@ -6,4 +6,4 @@
 module load python/2.7-anaconda-4.4
 source activate myuvcdat
 
-python run_match_traj_script.py $1
+python run_match_traj_script.py $1 $2
