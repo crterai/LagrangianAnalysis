@@ -23,9 +23,9 @@ import create_netcdfs
 model_output_location='/global/cscratch1/sd/terai/UP/archive/longcam5I_L30_20081001_00Z_f09_g16_1024/atm/hist/'
 model_prefix='longcam5I_L30_20081001_00Z_f09_g16_1024'
 derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
-year='2009'
-#months=['01','02','03','04','05','06','07','08','09']
-months=['11','12']
+year='2010'
+months=['01','02','03','04','05','06','07','08','09']
+#months=['11','12']
 #datestr=['30','31']
 datestr=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
 timestr=['00000','21600','43200','64800']
@@ -44,21 +44,24 @@ for i in months: #np.arange(4):
                 print ''.join(['Tried for',mo_date,'-',date,'-',time,': moving on'])
                 continue
             T=f_in1('T')
-            RELHUM=f_in1('RELHUM')
+            U=f_in1('U')
+            V=f_in1('V')
             p0=f_in1('P0')
             a=f_in1('hyam')
             b=f_in1('hybm')
             ps=f_in1('PS')
             P=create_variables.create_P(ps,a,b,p0)
-            LTS,EIS=create_variables.EIS_LTS(T,P,RELHUM)
-            outfile=''.join([derived_output_location,'LTS_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
+            U_hPa,V_hPa=create_variables.Winds_hPa(U,V,P,925)
+            outfile=''.join([derived_output_location,'Winds_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
             f_out=cdm.open(outfile,'w')
             
-            f_out.write(LTS)
+            f_out.write(U_hPa)
+            f_out.write(V_hPa)
             #f_out.write(V)
             f_out=create_netcdfs.transfer_attributes(f_in1,f_out)
             f_out=create_netcdfs.globalAttWrite(f_out) ; # Use function to write standard global atts to output file
             setattr(f_out,'script_URL','https://github.com/crterai/Analysis/commit/')
+            setattr(f_out,'script','create_Winds_netcdfs.py')
             f_out=create_netcdfs.add_git_hash(f_out)
             #filename=os.path.basename(__file__)
             #setattr(f_out,'script_used',filename)
