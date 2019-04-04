@@ -17,7 +17,7 @@ do
       cd ./Files_${time}_${1} 
       ALLFILES=($(ls ${1}_*.nc))
       #ALLFILESarray = ($ALLFILES)
-      indexi=49
+      indexi=1
             while [ $indexi -lt 50 ] 
             do
                 i50=50+indexi
@@ -30,20 +30,20 @@ do
       cd ../
 done
 
-#for time in $2 #00000 21600 43200 64800
-#do
-#      cd ./Files_${time}_${1} 
-#      ALLFILES=($(ls ${1}_*.nc))
-#      #ALLFILESarray = ($ALLFILES)
-#      indexi=315
-#            while [ $indexi -lt 366 ] 
-#            do
-#                im50=indexi-50
-#                filei=${ALLFILES[${indexi}]}
-#                #echo $file50
-#                i100=99+indexi
-#                filestoanalyze=${ALLFILES[@]:${im50}:365}
-#                nces $filestoanalyze AVG100days_${filei} 
-#                (( indexi++ ))
-#            done
-#done
+for time in $2 #00000 21600 43200 64800
+do
+      cd ./Files_${time}_${1} 
+      ALLFILES=($(ls ${1}_*.nc))
+      #ALLFILESarray = ($ALLFILES)
+      indexi=315
+            while [ $indexi -lt 366 ] 
+            do
+                im50=indexi-50
+                filei=${ALLFILES[${indexi}]}
+                #echo $file50
+                i100=99+indexi
+                filestoanalyze=${ALLFILES[@]:${im50}:365}
+                nces $filestoanalyze AVG100days_${filei} 
+                (( indexi++ ))
+            done
+done

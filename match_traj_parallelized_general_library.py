@@ -273,7 +273,7 @@ def match_traj_parallelized_metvariables(Start_index,End_index):
         f_log=open("".join(["log_traj_met_",str(Start_index),"_",str(End_index),".txt"]),"w+")
         #length_traj_table=Traj_table_array.shape[0]
         length_traj_table=End_index-Start_index
-        Output_table=np.zeros((length_traj_table,29)) # Create table to output data
+        Output_table=np.zeros((length_traj_table,8)) # Create table to output data
         Output_table[:,:]=np.nan                      # Set all data to nan
         start_index=Start_index
         for i in np.arange(start_index,End_index):   #loop from start to end index
@@ -323,10 +323,16 @@ def match_traj_parallelized_metvariables(Start_index,End_index):
                 # Access the dataset using cdms2 tools
                 f_LTS=cdm.open(''.join([filelocation,'LTS_',fileprefix,str_time,'.nc']))
                 time_index0=int(time_index0)  #Convert any decimals to integer to index
-                lat0=Traj_table_array[i,8+j] #Locate the latitude from the trajectory table
-                lon0=Traj_table_array[i,15+j]
+                lat0=Traj_table_array[i,16+j] #Locate the latitude from the trajectory table
+                lon0=Traj_table_array[i,23+j]
                 # Take the time slice and box with 5 x 5 deg. around interested area
-                LTS_grid=f_LTS('LTS',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                try:
+                    LTS_grid=f_LTS('LTS',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                except:
+                    f_log=open("".join(["log_traj_met_",str(Start_index),"_",str(End_index),".txt"]),"a")
+                    f_log.write("Failed getting LTS in box \n")
+                    f_log.close()
+                    continue
                 # Regrid the data to 1x1 deg boxes using the grid from GPCP (see above)
                 LTS_regridded=LTS_grid.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
                 # Take the value from the grid box that lies within 1deg box around the point
@@ -343,7 +349,10 @@ def match_traj_parallelized_metvariables(Start_index,End_index):
                 # Regrid the data to 1x1 deg boxes using the grid from GPCP (see above)
                 LTS_regridded_100dm=LTS_grid_100dm.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
                 # Take the value from the grid box that lies within 1deg box around the point
-                LTS_100dm=LTS_regridded_100dm(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                try:
+                    LTS_100dm=LTS_regridded_100dm(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                except:
+                    LTS_100dm=LTS_regridded_100dm(lat=(lat0-0.5,lat0+0.6),lon=(lon0-0.5,lon0+0.6))
                 # **************************************************************
 
                 # Enter values into the new output table
@@ -370,7 +379,7 @@ def match_traj_parallelized_metvariables_NoAnom(Start_index,End_index):
         f_log=open("".join(["log_traj_met_",str(Start_index),"_",str(End_index),".txt"]),"w+")
         #length_traj_table=Traj_table_array.shape[0]
         length_traj_table=End_index-Start_index
-        Output_table=np.zeros((length_traj_table,29)) # Create table to output data
+        Output_table=np.zeros((length_traj_table,8)) # Create table to output data - 8 is a changeable number
         Output_table[:,:]=np.nan                      # Set all data to nan
         start_index=Start_index
         for i in np.arange(start_index,End_index):   #loop from start to end index
@@ -420,14 +429,23 @@ def match_traj_parallelized_metvariables_NoAnom(Start_index,End_index):
                 # Access the dataset using cdms2 tools
                 f_LTS=cdm.open(''.join([filelocation,'LTS_',fileprefix,str_time,'.nc']))
                 time_index0=int(time_index0)  #Convert any decimals to integer to index
-                lat0=Traj_table_array[i,8+j] #Locate the latitude from the trajectory table
-                lon0=Traj_table_array[i,15+j]
+                lat0=Traj_table_array[i,16+j] #Locate the latitude from the trajectory table
+                lon0=Traj_table_array[i,23+j]
                 # Take the time slice and box with 5 x 5 deg. around interested area
-                LTS_grid=f_LTS('LTS',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                try:
+                    LTS_grid=f_LTS('LTS',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                except:
+                    f_log=open("".join(["log_traj_met_",str(Start_index),"_",str(End_index),".txt"]),"a")
+                    f_log.write("Failed getting LTS in box \n")
+                    f_log.close()
+                    continue
                 # Regrid the data to 1x1 deg boxes using the grid from GPCP (see above)
                 LTS_regridded=LTS_grid.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
                 # Take the value from the grid box that lies within 1deg box around the point
-                LTS=LTS_regridded(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                try:
+                    LTS=LTS_regridded(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                except:
+                    LTS=LTS_regridded(lat=(lat0-0.5,lat0+0.6),lon=(lon0-0.5,lon0+0.6))
                 LTS_array=np.array(cdu.averager(LTS,axis='xyt'))
                 # Set all very small values of zeros to NaNs
                 if LTS_array<-999:

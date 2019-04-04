@@ -10,11 +10,11 @@ module load nco/4.6.9
 cd /global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg
 
 # First move files into a separate directory, separated by Time and Type
-for time in $2  #00000 21600 43200 64800
-do
-      mkdir ./Files_${time}_${1}
-      cp ${1}_longcam5I_*${time}.nc ./Files_${time}_${1}
-done
+#for time in $2  #00000 21600 43200 64800
+#do
+#      mkdir ./Files_${time}_${1}
+#      cp ${1}_longcam5I_*${time}.nc ./Files_${time}_${1}
+#done
 
 # Within each of the directories, take the average (nces) over 100days,
 # which corresponds to 100 consecutive files because they are sorted by time
