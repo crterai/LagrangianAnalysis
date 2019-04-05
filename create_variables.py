@@ -124,9 +124,13 @@ def EIS_LTS(T,P,RELHUM):
         LTS.id='LTS'
         LTS.long_name='Lower tropospheric stability'
         LTS.units='K'
+        Theta_700.long_name='Potential temperature at 700hPa'
+        Theta_700.units='K'
+        Theta_1000.long_name='Potential temperature at 1000hPa'
+        Theta_1000.units='K'
         # !!! Still need to develop EIS !!!
         EIS=LTS
-        return LTS,EIS
+        return LTS,EIS,Theta_700,Theta_1000
 
 def BLH(P,Theta,Z3):
         # Calculates the boundary layer height (BLH), which is defined as the 
