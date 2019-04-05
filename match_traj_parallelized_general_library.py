@@ -353,10 +353,11 @@ def match_traj_parallelized_metvariables(Start_index,End_index):
                     LTS_100dm=LTS_regridded_100dm(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
                 except:
                     LTS_100dm=LTS_regridded_100dm(lat=(lat0-0.5,lat0+0.6),lon=(lon0-0.5,lon0+0.6))
+                LTS_100dm_array=np.array(cdu.averager(LTS_100dm,axis='xyt'))
                 # **************************************************************
 
                 # Enter values into the new output table
-                Output_table[i-start_index,j+1]=LTS_array-LTS_100dm
+                Output_table[i-start_index,j+1]=LTS_array-LTS_100dm_array
         np.set_printoptions(precision=5)
         # Save the table into a text file with 6 significant digits
         np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectory_LTS_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')

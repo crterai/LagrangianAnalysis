@@ -24,7 +24,7 @@ model_output_location='/global/cscratch1/sd/terai/UP/archive/longcam5I_L30_20081
 model_prefix='longcam5I_L30_20081001_00Z_f09_g16_1024'
 derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
 year='2009'
-months=['11','12']
+months=['01']
 #months=['01']
 #datestr=['23','24','25','26','27','28','29','30','31']
 datestr=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
@@ -60,19 +60,19 @@ for i in months: #np.arange(4):
             outfile=''.join([derived_output_location,'LTSplusQ_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
             Q_700=create_variables.Variable_hPa(Q,P,700.)
             OMEGA_700=create_variable.Variable_hPa(OMEGA,P,700.)
-            Q_700.id='Q700'
-            OMEGA_700.id='OMEGA700'
-            if len(Q_700.shape) > 3
+            if len(Q_700.shape) > 3:
                 Q_700=cdu.averager(Q_700,axis=1)
                 OMEGA_700=cdu.averager(OMEGA_700,axis=1)
             f_out=cdm.open(outfile,'w')
+            Q_700.id='Q700'
             Theta_700.id='THETA700'
             Theta_1000.id='THETA1000'
+            OMEGA_700.id='OMEGA700'
             f_out.write(LTS)
             f_out.write(Q_700)
             f_out.write(Theta_700)
             f_out.write(Theta_1000)
-            #f_out.write(V)
+            f_out.write(OMEGA_700)
             f_out=create_netcdfs.transfer_attributes(f_in1,f_out)
             f_out=create_netcdfs.globalAttWrite(f_out) ; # Use function to write standard global atts to output file
             setattr(f_out,'script_URL','https://github.com/crterai/Analysis/commit/')
