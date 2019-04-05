@@ -116,7 +116,7 @@ def Winds_hPa(U,V,P,pressurelevel):
 
 def EIS_LTS(T,P,RELHUM):
         #Calculates the Lower Tropospheric Stability (LTS) and Estimated Inversion Strenght (EIS)
-        Theta_700=cdu.logLinearInterpolation(T,P,levels=70000)*(1000./750.)**(2./7.)
+        Theta_700=cdu.logLinearInterpolation(T,P,levels=70000)*(1000./700.)**(2./7.)
         Theta_700=cdu.averager(Theta_700,axis='z')
         Theta_1000=cdu.logLinearInterpolation(T,P,levels=100000)
         Theta_1000=cdu.averager(Theta_1000,axis='z')

@@ -17,7 +17,7 @@ do
       cd ./Files_${time}_${1} 
       ALLFILES=($(ls ${1}_*.nc))
       #ALLFILESarray = ($ALLFILES)
-      indexi=1
+      indexi=0
             while [ $indexi -lt 50 ] 
             do
                 i50=50+indexi
