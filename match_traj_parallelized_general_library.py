@@ -273,12 +273,14 @@ def match_traj_parallelized_metvariables(Start_index,End_index):
         f_log=open("".join(["log_traj_met_",str(Start_index),"_",str(End_index),".txt"]),"w+")
         #length_traj_table=Traj_table_array.shape[0]
         length_traj_table=End_index-Start_index
-        Output_table=np.zeros((length_traj_table,8)) # Create table to output data
+        Output_table=np.zeros((length_traj_table,22)) # Create table to output data
+        Output_table_raw=np.zeros((length_traj_table,22)) # Create table to output data
         Output_table[:,:]=np.nan                      # Set all data to nan
         start_index=Start_index
         for i in np.arange(start_index,End_index):   #loop from start to end index
             #print i
             Output_table[i-start_index,0]=int(Traj_table_array[i,0]) #write the traj number
+            Output_table_raw[i-start_index,0]=int(Traj_table_array[i,0]) #write the traj number
             #In a log file, keep track of what trajectories get analyzed
             f_log=open("".join(["log_traj_met_",str(Start_index),"_",str(End_index),".txt"]),"a")
             f_log.write("".join([str(int(Traj_table_array[i,0]))," \n"]))
@@ -321,29 +323,35 @@ def match_traj_parallelized_metvariables(Start_index,End_index):
                 filelocation='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
                 fileprefix='longcam5I_L30_20081001_00Z_f09_g16_1024.cam.h1.'
                 # Access the dataset using cdms2 tools
-                f_LTS=cdm.open(''.join([filelocation,'LTS_',fileprefix,str_time,'.nc']))
+                f_LTS=cdm.open(''.join([filelocation,'LTSplusQ_',fileprefix,str_time,'.nc']))
                 time_index0=int(time_index0)  #Convert any decimals to integer to index
                 lat0=Traj_table_array[i,16+j] #Locate the latitude from the trajectory table
                 lon0=Traj_table_array[i,23+j]
                 # Take the time slice and box with 5 x 5 deg. around interested area
-                try:
-                    LTS_grid=f_LTS('LTS',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
-                except:
-                    f_log=open("".join(["log_traj_met_",str(Start_index),"_",str(End_index),".txt"]),"a")
-                    f_log.write("Failed getting LTS in box \n")
-                    f_log.close()
-                    continue
+                LTS_grid=f_LTS('LTS',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                OMEGA700_grid=f_LTS('OMEGA700',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                Q700_grid=f_LTS('Q700',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
                 # Regrid the data to 1x1 deg boxes using the grid from GPCP (see above)
                 LTS_regridded=LTS_grid.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+                OMEGA700_regridded=OMEGA700_grid.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+                Q700_regridded=Q700_grid.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
                 # Take the value from the grid box that lies within 1deg box around the point
                 LTS=LTS_regridded(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
                 LTS_array=np.array(cdu.averager(LTS,axis='xyt'))
+                OMEGA700=OMEGA700_regridded(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                OMEGA700_array=np.array(cdu.averager(OMEGA700,axis='xyt'))
+                Q700=Q700_regridded(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                Q700_array=np.array(cdu.averager(Q700,axis='xyt'))
                 # Set all very small values of zeros to NaNs
                 if LTS_array<-999:
                     LTS_array=np.nan
+                if OMEGA700_array<-999:
+                    OMEGA700_array=np.nan
+                if Q700_array<-999:
+                    Q700_array=np.nan
 
                 # ********  Repeat the steps above for the 100-day mean data
-                f_LTS_100dm=cdm.open(''.join([filelocation,'AVG100days_LTS_',fileprefix,str_time,'.nc']))
+                f_LTS_100dm=cdm.open(''.join([filelocation,'AVG100days_LTSplusQ_',fileprefix,str_time,'.nc']))
                 # Take the time slice and box with 5 x 5 deg. around interested area
                 LTS_grid_100dm=f_LTS_100dm('LTS',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
                 # Regrid the data to 1x1 deg boxes using the grid from GPCP (see above)
@@ -354,13 +362,40 @@ def match_traj_parallelized_metvariables(Start_index,End_index):
                 except:
                     LTS_100dm=LTS_regridded_100dm(lat=(lat0-0.5,lat0+0.6),lon=(lon0-0.5,lon0+0.6))
                 LTS_100dm_array=np.array(cdu.averager(LTS_100dm,axis='xyt'))
+                #OMEGA700
+                OMEGA700_grid_100dm=f_LTS_100dm('OMEGA700',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                # Regrid the data to 1x1 deg boxes using the grid from GPCP (see above)
+                OMEGA700_regridded_100dm=OMEGA700_grid_100dm.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+                # Take the value from the grid box that lies within 1deg box around the point
+                try:
+                    OMEGA700_100dm=OMEGA700_regridded_100dm(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                except:
+                    OMEGA700_100dm=OMEGA700_regridded_100dm(lat=(lat0-0.5,lat0+0.6),lon=(lon0-0.5,lon0+0.6))
+                OMEGA700_100dm_array=np.array(cdu.averager(OMEGA700_100dm,axis='xyt'))
+                #Q700
+                Q700_grid_100dm=f_LTS_100dm('Q700',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                # Regrid the data to 1x1 deg boxes using the grid from GPCP (see above)
+                Q700_regridded_100dm=Q700_grid_100dm.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+                # Take the value from the grid box that lies within 1deg box around the point
+                try:
+                    Q700_100dm=Q700_regridded_100dm(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                except:
+                    Q700_100dm=Q700_regridded_100dm(lat=(lat0-0.5,lat0+0.6),lon=(lon0-0.5,lon0+0.6))
+                Q700_100dm_array=np.array(cdu.averager(Q700_100dm,axis='xyt'))
+
                 # **************************************************************
 
                 # Enter values into the new output table
                 Output_table[i-start_index,j+1]=LTS_array-LTS_100dm_array
+                Output_table_raw[i-start_index,j+1]=LTS_array
+                Output_table[i-start_index,j+8]=OMEGA700_array-OMEGA700_100dm_array
+                Output_table_raw[i-start_index,j+8]=OMEGA700_array
+                Output_table[i-start_index,j+15]=Q700_array-Q700_100dm_array
+                Output_table_raw[i-start_index,j+15]=Q700_array
         np.set_printoptions(precision=5)
         # Save the table into a text file with 6 significant digits
         np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectory_LTS_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')
+        np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectory_raw_LTS_',str(Start_index),'_',str(End_index),'.txt']),Output_table_raw,delimiter=',  ',fmt='%.5e')
 
 def match_traj_parallelized_metvariables_NoAnom(Start_index,End_index):
         """

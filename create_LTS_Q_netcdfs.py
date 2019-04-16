@@ -24,7 +24,8 @@ model_output_location='/global/cscratch1/sd/terai/UP/archive/longcam5I_L30_20081
 model_prefix='longcam5I_L30_20081001_00Z_f09_g16_1024'
 derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
 year='2009'
-months=['01']
+months=[str(sys.argv[1])]
+#months=['01']
 #months=['01']
 #datestr=['23','24','25','26','27','28','29','30','31']
 datestr=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
@@ -32,9 +33,9 @@ timestr=['00000','21600','43200','64800']
 
 for i in months: #np.arange(4):
     mo_date=i
-    print i
+    #print i
     for j in datestr:
-        print j
+        #print j
         date=j
         for k in timestr:
             time=k
@@ -59,7 +60,7 @@ for i in months: #np.arange(4):
                 Theta_1000=cdu.averager(Theta_1000,axis=1)
             outfile=''.join([derived_output_location,'LTSplusQ_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
             Q_700=create_variables.Variable_hPa(Q,P,700.)
-            OMEGA_700=create_variable.Variable_hPa(OMEGA,P,700.)
+            OMEGA_700=create_variables.Variable_hPa(OMEGA,P,700.)
             if len(Q_700.shape) > 3:
                 Q_700=cdu.averager(Q_700,axis=1)
                 OMEGA_700=cdu.averager(OMEGA_700,axis=1)
