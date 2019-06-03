@@ -114,6 +114,24 @@ def Winds_hPa(U,V,P,pressurelevel):
         V_hPa.id='V'
         return U_hPa,V_hPa
 
+def Winds_lowestLevel(U,V,Z):
+        # Calculates and creates a file with pressurelevel hPa winds
+        U_level1=U[:,-1,:,:]
+        U_level1.long_name=''.join(['U at lowest model layer',''])
+        U_level1.id='U'
+        V_level1=V[:,-1,:,:]
+        V_level1.long_name=''.join(['V at lowest model layer',''])
+        V_level1.id='V'
+        Windspeed_level1=(U_level1**2+V_level1**2)**0.5
+        Windspeed_level1.long_name='Wind speed at lowest model layer'
+        Windspeed_level1.notes='(U_level1**2+V_level1**2)**0.5'
+        Windspeed_level1.units='m s-1'
+        Windspeed_level1.id='WINDSPEED'
+        Z_level1=Z[:,-1,:,:]
+        Z_level1.long_name=''.join(['Z at lowest model layer',''])
+        Z_level1.id='Z3'
+        return U_level1,V_level1,Windspeed_level1,Z_level1
+
 def EIS_LTS(T,P,RELHUM):
         #Calculates the Lower Tropospheric Stability (LTS) and Estimated Inversion Strenght (EIS)
         Theta_700=cdu.logLinearInterpolation(T,P,levels=70000)*(1000./700.)**(2./7.)
