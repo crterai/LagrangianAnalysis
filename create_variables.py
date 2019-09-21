@@ -49,12 +49,19 @@ def CLDTOP_NdTCLDTOT_CAM5(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,CLDTOT):
                 TGCLDLWP_sum=np.sum(np.squeeze(TGCLDLWP[:,x,y]))
                 if (TGCLDLWP_sum > 0.000001):
                     for t in np.arange(Z3.shape[0]):
-                        Cltop_index=np.int(CLDTOP_int[t,x,y])
+                        Cltop_cloud=np.squeeze(np.array(CLOUD[t,:,x,y]))
+                        Cltop_cloud[Cltop_cloud<0.2]=0.
+                        Cltop_index=np.nonzero(Cltop_cloud)[0]
+                        #Cltop_index=np.int(CLDTOP_int[t,x,y])                  
+                        if (Cltop_index.shape[0] > 1):
+                            Cltop_index=Cltop_index[0]
+                        if (Cltop_index<28 and CLOUD[t,Cltop_index+1,x,y]>0.0):
+                            Cltop_index=Cltop_index
                         CloudTOT=np.squeeze(CLDTOT[t,x,y])
                         CloudyLWP=TGCLDLWP[t,x,y]/CloudTOT
-                        if (CloudyLWP>0.00005 and Cltop_index>cltop_idxmax and Cltop_index<=cltop_idxmin and CloudTOT>0.0 and CLOUD[t,Cltop_index,x,y]>0.0):  #set Cltop_index>34 for UPCAM
-                            CLDTOPSPNC[t,x,y]=SPNC[t,Cltop_index,x,y]
+                        if (CloudyLWP>0.005 and Cltop_index>cltop_idxmax and Cltop_index<=cltop_idxmin and CloudTOT>0.0 and CLOUD[t,Cltop_index,x,y]>0.0):  #set Cltop_index>34 for UPCAM                                                     
                             CLDTOPZ3[t,x,y]=Z3[t,Cltop_index,x,y]
+                            CLDTOPSPNC[t,x,y]=SPNC[t,Cltop_index,x,y]
                             CLDTOPT[t,x,y]=T[t,Cltop_index,x,y]
                         else:
                             CLDTOPSPNC[t,x,y]=-1e15

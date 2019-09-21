@@ -52,7 +52,7 @@ for i in months: #np.arange(4):
             SPNC=f_in2('ICWNC')
             CLOUD=f_in1('CLOUD')
             cldtopspnc,cldtopt,cldtopz3,cldtot,tgcldlwp=create_variables.CLDTOP_NdTCLDTOT_CAM5(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,CLDTOT)
-            outfile=''.join([derived_output_location,'CloudTopv2_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
+            outfile=''.join([derived_output_location,'CloudTopv3_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
             f_out=cdm.open(outfile,'w')
             
             att_keys = f_in1.attributes.keys()
@@ -62,7 +62,7 @@ for i in months: #np.arange(4):
                 to_out = att_dic[i]
             setattr(f_out,to_out[0],to_out[1])
             setattr(f_out,'comments2','Used create_variable.CLDTOP_NdTCLDTOT_CAM5 to create cloud output')
-            setattr(f_out,'comments3','Updated create_variable.CLDTOP_NdTCLDTOT_CAM5 to relax output')
+            setattr(f_out,'comments3','Updated create_variable.CLDTOP_NdTCLDTOT_CAM5 to use hightest elevation with CLOUD>0.2 as teh cltop, rather than CLDTOP output')
             globalAttWrite(f_out,options=None) ; # Use function to write standard global atts to output file
             f_out.write(cldtopspnc)
             f_out.write(cldtopz3)
