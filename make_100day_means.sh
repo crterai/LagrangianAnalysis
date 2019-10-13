@@ -5,9 +5,9 @@
 # inputs ($1 and $2) are the prefix (e.g. CloudTopv2) 
 # and the time slot (00000, 21600,..)
 
-module load nco/4.6.9
+module load nco/4.7.9-intel
 
-cd /global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg
+cd /global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/Processed/
 
 # First move files into a separate directory, separated by Time and Type
 #for time in $2  #00000 21600 43200 64800
@@ -21,7 +21,7 @@ cd /global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg
 # Name each file based on day 50
 for time in $2 #00000 21600 43200 64800
 do
-      cd ./Files_${time}_${1} 
+      cd ./Files_${time}_${1}
       ALLFILES=($(ls ${1}_*.nc))
       #ALLFILESarray = ($ALLFILES)
       indexi=0

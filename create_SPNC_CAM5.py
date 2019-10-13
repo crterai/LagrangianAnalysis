@@ -19,14 +19,14 @@ from durolib import globalAttWrite,writeToLog,trimModelList
 from socket import gethostname
 import create_variables
 
-model_output_location='/global/cscratch1/sd/terai/UP/archive/longcam5I_L30_20081001_00Z_f09_g16_1024/atm/hist/'
-model_prefix='longcam5I_L30_20081001_00Z_f09_g16_1024'
-derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
+model_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/'
+model_prefix='longcam5I_L30_20081001_0Z_f09_g16_828'
+derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/Processed/'
 year='2009'
-#months=['02','03','04','05','06','07','08','09']
-months=['01']
-datestr=['24','25','26','27','28','29','30','31']
-#datestr=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
+months=['12']
+#months=['01','02','03','04','05','06','07','08','09','10','11','12']
+#datestr=['24','25','26','27','28','29','30','31']
+datestr=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
 timestr=['00000','21600','43200','64800']
 #timestr=['03600','25200','46800','68400']
 

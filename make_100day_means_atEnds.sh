@@ -5,9 +5,9 @@
 # inputs ($1 and $2) are the prefix (e.g. CloudTopv2) 
 # and the time slot (00000, 21600,..)
 
-module load nco/4.6.9
+module load nco/4.7.9-intel
 
-cd /global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg
+cd /global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/Processed
 
 # Within each of the directories, take the average (nces) over 100days,
 # which corresponds to 100 consecutive files because they are sorted by time

@@ -20,7 +20,7 @@ def match_traj_parallelized_general(Start_index,End_index):
         """
         Takes the start index of a table with trajectory times and locations and prints out total cloud fraction, LWP, cloud top height, and cloud top Nc (in m-3) at those locations and times in a txt file with name CAM5_trajectory_CLDTOT_LWP_Cltop_Nc_STARTINDEX_ENDINDEX.txt
         """
-        trajectory_file='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_trajectories.dms'    #trajectory file is already specified in this case
+        trajectory_file='~/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectories.dms'    #trajectory file is already specified in this case
         # open table with trajectory times and location
         Traj_table=pandas.read_table(trajectory_file,delim_whitespace=True)  
         Traj_table_array=np.array(Traj_table[0:])
@@ -31,11 +31,13 @@ def match_traj_parallelized_general(Start_index,End_index):
         gpcp_grid=obs_freq_pdf.getGrid()
         
         
-        f_log=open("".join(["log_traj_",str(Start_index),"_",str(End_index),".txt"]),"w+")
+        f_log=open("".join(["log_trajv3_",str(Start_index),"_",str(End_index),".txt"]),"w+")
         #length_traj_table=Traj_table_array.shape[0]
         length_traj_table=End_index-Start_index
         Output_table=np.zeros((length_traj_table,29)) # Create table to output data
         Output_table[:,:]=np.nan                      # Set all data to nan
+        Output_table_noanom=np.zeros((length_traj_table,29)) # Create table to output data
+        Output_table_noanom[:,:]=np.nan                      # Set all data to nan
         start_index=Start_index
         for i in np.arange(start_index,End_index):   #loop from start to end index
             #print i
@@ -79,10 +81,10 @@ def match_traj_parallelized_general(Start_index,End_index):
                     str_time0='00000'
                     time_index0=0
                 str_time=''.join([str_day,'-',str_time0])
-                filelocation='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
-                fileprefix='longcam5I_L30_20081001_00Z_f09_g16_1024.cam.h1.'
+                filelocation='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/Processed/'
+                fileprefix='longcam5I_L30_20081001_0Z_f09_g16_828.cam.h1.'
                 # Access the dataset using cdms2 tools
-                f_CloudTop=cdm.open(''.join([filelocation,'CloudTopv2_',fileprefix,str_time,'.nc']))
+                f_CloudTop=cdm.open(''.join([filelocation,'CloudTopv3_',fileprefix,str_time,'.nc']))
                 time_index0=int(time_index0)  #Convert any decimals to integer to index
                 lat0=Traj_table_array[i,16+j] #Locate the latitude from the trajectory table
                 lon0=Traj_table_array[i,23+j]
@@ -116,7 +118,7 @@ def match_traj_parallelized_general(Start_index,End_index):
                     CltopSPNC_array=np.nan
 
                 # ********  Repeat the steps above for the 100-day mean data
-                f_CloudTop_100dm=cdm.open(''.join([filelocation,'AVG100days_CloudTopv2_',fileprefix,str_time,'.nc']))
+                f_CloudTop_100dm=cdm.open(''.join([filelocation,'AVG100days_CloudTopv3_',fileprefix,str_time,'.nc']))
                 # Take the time slice and box with 5 x 5 deg. around interested area
                 LWP_grid_100dm=f_CloudTop_100dm('TGCLDLWP',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
                 CLDTOT_grid_100dm=f_CloudTop_100dm('CLDTOT',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
@@ -143,9 +145,15 @@ def match_traj_parallelized_general(Start_index,End_index):
                 Output_table[i-start_index,j+8]=LWP_array-LWP_array_100dm
                 Output_table[i-start_index,j+15]=CltopZ3_array-CltopZ3_array_100dm
                 Output_table[i-start_index,j+22]=CltopSPNC_array-CltopSPNC_array_100dm
+                # Enter values into the new output table
+                Output_table_noanom[i-start_index,j+1]=CLDTOT_array
+                Output_table_noanom[i-start_index,j+8]=LWP_array
+                Output_table_noanom[i-start_index,j+15]=CltopZ3_array
+                Output_table_noanom[i-start_index,j+22]=CltopSPNC_array
         np.set_printoptions(precision=5)
         # Save the table into a text file with 6 significant digits
-        np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectory_CLDTOT_LWP_Cltop_Nc_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')
+        np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectoryv3_CLDTOT_LWP_Cltop_Nc_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')
+                np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_NoAnom_trajectoryv3_CLDTOT_LWP_Cltop_Nc_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')
 
 def match_traj_parallelized_general_NoAnom(Start_index,End_index):
         """

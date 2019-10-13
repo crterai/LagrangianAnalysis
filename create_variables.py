@@ -59,7 +59,7 @@ def CLDTOP_NdTCLDTOT_CAM5(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,CLDTOT):
                             Cltop_index=Cltop_index
                         CloudTOT=np.squeeze(CLDTOT[t,x,y])
                         CloudyLWP=TGCLDLWP[t,x,y]/CloudTOT
-                        if (CloudyLWP>0.005 and Cltop_index>cltop_idxmax and Cltop_index<=cltop_idxmin and CloudTOT>0.0 and CLOUD[t,Cltop_index,x,y]>0.0):  #set Cltop_index>34 for UPCAM                                                     
+                        if (CloudyLWP>0.005 and Cltop_index>cltop_idxmax and Cltop_index<=cltop_idxmin and CloudTOT>0.2 and CLOUD[t,Cltop_index,x,y]>0.0):  #set Cltop_index>34 for UPCAM                                                     
                             CLDTOPZ3[t,x,y]=Z3[t,Cltop_index,x,y]
                             CLDTOPSPNC[t,x,y]=SPNC[t,Cltop_index,x,y]
                             CLDTOPT[t,x,y]=T[t,Cltop_index,x,y]
@@ -158,7 +158,7 @@ def EIS_LTS(T,P,RELHUM):
         return LTS,EIS,Theta_700,Theta_1000
 
 def BLH(P,Theta,Z3):
-        # Calculates the boundary layer height (BLH), which is defined as the 
+        # Calculates the boundary layer height (BLH), which is defined as the level of maximum dTheta/dZ
         mv_time=Z3.getTime()
         mv_lat=Z3.getAxis(2)
         mv_lon=Z3.getAxis(3)
