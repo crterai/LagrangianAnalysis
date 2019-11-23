@@ -31,7 +31,7 @@ def match_traj_parallelized_general(Start_index,End_index):
         gpcp_grid=obs_freq_pdf.getGrid()
         
         
-        f_log=open("".join(["log_trajv3_",str(Start_index),"_",str(End_index),".txt"]),"w+")
+        f_log=open("".join(["log_trajv4_",str(Start_index),"_",str(End_index),".txt"]),"w+")
         #length_traj_table=Traj_table_array.shape[0]
         length_traj_table=End_index-Start_index
         Output_table=np.zeros((length_traj_table,29)) # Create table to output data
@@ -42,8 +42,9 @@ def match_traj_parallelized_general(Start_index,End_index):
         for i in np.arange(start_index,End_index):   #loop from start to end index
             #print i
             Output_table[i-start_index,0]=int(Traj_table_array[i,0]) #write the traj number
+            Output_table_noanom[i-start_index,0]=int(Traj_table_array[i,0]) #write the traj number
             #In a log file, keep track of what trajectories get analyzed
-            f_log=open("".join(["log_traj_",str(Start_index),"_",str(End_index),".txt"]),"a")
+            f_log=open("".join(["log_trajv4_",str(Start_index),"_",str(End_index),".txt"]),"a")
             f_log.write("".join([str(int(Traj_table_array[i,0]))," \n"]))
             f_log.close()
             for j in np.arange(7):   #loop across the 7 instances along trajectory
@@ -84,7 +85,7 @@ def match_traj_parallelized_general(Start_index,End_index):
                 filelocation='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/Processed/'
                 fileprefix='longcam5I_L30_20081001_0Z_f09_g16_828.cam.h1.'
                 # Access the dataset using cdms2 tools
-                f_CloudTop=cdm.open(''.join([filelocation,'CloudTopv3_',fileprefix,str_time,'.nc']))
+                f_CloudTop=cdm.open(''.join([filelocation,'CloudTopv4_',fileprefix,str_time,'.nc']))
                 time_index0=int(time_index0)  #Convert any decimals to integer to index
                 lat0=Traj_table_array[i,16+j] #Locate the latitude from the trajectory table
                 lon0=Traj_table_array[i,23+j]
@@ -116,9 +117,9 @@ def match_traj_parallelized_general(Start_index,End_index):
                     CltopZ3_array=np.nan
                 if CltopSPNC_array<0.0001:
                     CltopSPNC_array=np.nan
-
+                
                 # ********  Repeat the steps above for the 100-day mean data
-                f_CloudTop_100dm=cdm.open(''.join([filelocation,'AVG100days_CloudTopv3_',fileprefix,str_time,'.nc']))
+                f_CloudTop_100dm=cdm.open(''.join([filelocation,'AVG100days_CloudTopv4_',fileprefix,str_time,'.nc']))
                 # Take the time slice and box with 5 x 5 deg. around interested area
                 LWP_grid_100dm=f_CloudTop_100dm('TGCLDLWP',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
                 CLDTOT_grid_100dm=f_CloudTop_100dm('CLDTOT',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
@@ -145,6 +146,7 @@ def match_traj_parallelized_general(Start_index,End_index):
                 Output_table[i-start_index,j+8]=LWP_array-LWP_array_100dm
                 Output_table[i-start_index,j+15]=CltopZ3_array-CltopZ3_array_100dm
                 Output_table[i-start_index,j+22]=CltopSPNC_array-CltopSPNC_array_100dm
+                
                 # Enter values into the new output table
                 Output_table_noanom[i-start_index,j+1]=CLDTOT_array
                 Output_table_noanom[i-start_index,j+8]=LWP_array
@@ -152,8 +154,8 @@ def match_traj_parallelized_general(Start_index,End_index):
                 Output_table_noanom[i-start_index,j+22]=CltopSPNC_array
         np.set_printoptions(precision=5)
         # Save the table into a text file with 6 significant digits
-        np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectoryv3_CLDTOT_LWP_Cltop_Nc_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')
-                np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_NoAnom_trajectoryv3_CLDTOT_LWP_Cltop_Nc_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')
+        np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectoryv4_CLDTOT_LWP_Cltop_Nc_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')
+        np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectoryv4_raw_CLDTOT_LWP_Cltop_Nc_',str(Start_index),'_',str(End_index),'.txt']),Output_table_noanom,delimiter=',  ',fmt='%.5e')
 
 def match_traj_parallelized_general_NoAnom(Start_index,End_index):
         """

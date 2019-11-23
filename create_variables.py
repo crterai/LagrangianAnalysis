@@ -19,7 +19,7 @@ from durolib import globalAttWrite,writeToLog,trimModelList
 from socket import gethostname
 
 def CLDTOP_NdTCLDTOT_CAM5(SPNC,T,Z3,CLOUD,CLDTOP,TGCLDLWP,CLDTOT):
-        cltop_idxmax=4
+        cltop_idxmax=16
         cltop_idxmin=29
         
         mv_time=SPNC.getTime()
