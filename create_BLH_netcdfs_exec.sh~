@@ -6,4 +6,4 @@
 #module load python/2.7-anaconda-4.4
 #source activate myuvcdat
 
-python create_LTS_Q_netcdfs.py ${1}
+python create_BLH_netcdfs.py ${1}

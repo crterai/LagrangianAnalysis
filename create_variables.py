@@ -157,25 +157,35 @@ def EIS_LTS(T,P,RELHUM):
         EIS=LTS
         return LTS,EIS,Theta_700,Theta_1000
 
-def BLH(P,Theta,Z3):
+def BLH(P,T,Z3):
         # Calculates the boundary layer height (BLH), which is defined as the level of maximum dTheta/dZ
         mv_time=Z3.getTime()
         mv_lat=Z3.getAxis(2)
         mv_lon=Z3.getAxis(3)
         z3_units=Z3.units
         mv_typecode=Z3.typecode()
-  
-        Z3=np.array(Z3)
-        P=np.array(P)
-        SPNC=np.array(SPNC)
-        mv_time=SPNC.getTime()
-        mv_lat=SPNC.getAxis(2)
-        mv_lon=SPNC.getAxis(3)
-        spnc_units=SPNC.units
-        z3_units=Z3.units
         t_units=T.units
-        mv_typecode=SPNC.typecode()
-  
+        T=np.array(T)
+        Theta=T*(100000./P)**(2./7.)
         Z3=np.array(Z3)
-        CLOUD=np.array(CLOUD)
-        SPNC=np.array(SPNC)
+        dThetadZ3=(Theta[:,1:,:,:]-Theta[:,:-1,:,:])/(Z3[:,1:,:,:]-Z3[:,:-1,:,:])
+        Z3_avheight=(Z3[:,1:,:,:]+Z3[:,:-1,:,:])/2.
+        BLH_array=np.zeros((Z3.shape[0],Z3.shape[2],Z3.shape[3]))
+        dThetadZ3_array=np.zeros((Z3.shape[0],Z3.shape[2],Z3.shape[3]))
+
+        id_max_dThetadZ3=np.argmax(dThetadZ3[:,13:,:,:],axis=1)
+        max_dThetadZ3=np.amax(dThetadZ3[:,13:,:,:],axis=1)
+        dThetadZ3_array=max_dThetadZ3
+        Z3_avheight_subset=Z3_avheight[:,13:,:,:]
+        for x in np.arange(Z3.shape[2]):
+            for y in np.arange(Z3.shape[3]):
+                for t in np.arange(Z3.shape[0]):
+                    BLH_array[t,x,y]=Z3_avheight_subset[t,id_max_dThetadZ3[t,x,y],x,y]
+        
+        BLH_var=cdm.createVariable(BLH_array,typecode=mv_typecode,axes=[mv_time,mv_lat,mv_lon],id='BLH')
+        BLH_var.units=z3_units
+        BLH.long_name='Boundary Layer Height based on height with maximum dTheta/dZ below 10000 m'
+        dThetadZ3_var=cdm.createVariable(dThetadZ3_array,typecode=mv_typecode,axes=[mv_time,mv_lat,mv_lon],id='dThetadZ')
+        dThetadZ3_var.long_name='Maximum dTheta/dZ below 10000 m'
+        dThetadZ3_var.units='K m-1'
+        return BLH_var,dThetadZ3_var

@@ -19,15 +19,16 @@ import create_netcdfs
 #model_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
 #model_prefix='longcam5I_L30_20081001_00Z_f09_g16_1024'
 #derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
-model_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
-model_prefix='Winds_longcam5I_L30_20091230_00Z_f09_g16_1024'
-derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
-year='2010'
-months=['04','05','06','07','08','09','10']
+model_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/Winds/'
+model_prefix='Winds_longcam5I_L30_20081001_0Z_f09_g16_828'
+derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/Winds/'
+year='2009'
+months=['10','11','12']
 #months=['10','11','12']
 #datestr=['30','31']
 datestr=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
-timestr=['03600','25200','46800','68400']
+#timestr=['03600','25200','46800','68400']
+timestr=['00000','21600','43200','64800']
 
 f_gpcp=cdm.open('~/Obs_datasets/GPCP_PDF/GPCPv1pt2_PREC_pdf.nc')
 obs_freq_pdf=f_gpcp('PRECFREQPDF')
@@ -74,7 +75,7 @@ for i in months: #np.arange(4):
             f_out.write(var2_regrid)
             f_out=create_netcdfs.transfer_attributes(f_in1,f_out)
             f_out=create_netcdfs.globalAttWrite(f_out) ; # Use function to write standard global atts to output file
-            setattr(f_out,'script_URL','https://github.com/crterai/Analysis/commit/')
+            setattr(f_out,'script_URL','https://github.com/crterai/LagrangianAnalysis/commit/')
             filename=os.path.basename(__file__)
             setattr(f_out,'script_used',filename)
             f_out=create_netcdfs.add_git_hash(f_out)

@@ -20,22 +20,25 @@ from socket import gethostname
 import create_variables
 import create_netcdfs
 
+#model_output_location='/global/cscratch1/sd/terai/UP/archive/longcam5I_L30_20081001_00Z_f09_g16_1024/atm/hist/'
+#model_prefix='longcam5I_L30_20081001_00Z_f09_g16_1024'
+#derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
 model_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/'
 model_prefix='longcam5I_L30_20081001_0Z_f09_g16_828'
-derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/Winds/'
+derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/BLH/'
 year='2009'
-months=['01','02','03','04','05','06','07','08','09','10','11','12']
-#months=['11','12']
-#datestr=['30','31']
+months=[str(sys.argv[1])]
+#months=['01','02','03','04','05','06','07','08','09','10','11','12']
+#months=['01']
+#datestr=['23','24','25','26','27','28','29','30','31']
 datestr=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
 timestr=['00000','21600','43200','64800']
-#timestr=['03600','25200','46800','68400']
 
 for i in months: #np.arange(4):
     mo_date=i
-    print i
+    #print i
     for j in datestr:
-        print j
+        #print j
         date=j
         for k in timestr:
             time=k
@@ -45,27 +48,23 @@ for i in months: #np.arange(4):
                 print ''.join(['Tried for',mo_date,'-',date,'-',time,': moving on'])
                 continue
             T=f_in1('T')
-            U=f_in1('U')
-            V=f_in1('V')
             p0=f_in1('P0')
             a=f_in1('hyam')
             b=f_in1('hybm')
             ps=f_in1('PS')
+            Z3=f_in1('Z3')
             P=create_variables.create_P(ps,a,b,p0)
-            U_hPa,V_hPa=create_variables.Winds_hPa(U,V,P,925)
-            outfile=''.join([derived_output_location,'Winds_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
+            BLH,dThetadZ=create_variables.BLH(P,T,Z3)
+            outfile=''.join([derived_output_location,'BLH_',model_prefix,'.cam.h1.',year,'-',mo_date,'-',date,'-',time,'.nc'])
             f_out=cdm.open(outfile,'w')
-            
-            f_out.write(U_hPa)
-            f_out.write(V_hPa)
-            #f_out.write(V)
+            f_out.write(BLH)
+            f_out.write(dThetadZ)
             f_out=create_netcdfs.transfer_attributes(f_in1,f_out)
             f_out=create_netcdfs.globalAttWrite(f_out) ; # Use function to write standard global atts to output file
-            setattr(f_out,'script_URL','https://github.com/crterai/LagrangianAnalysis/commit/')
-            setattr(f_out,'script','create_Winds_netcdfs.py')
-            f_out=create_netcdfs.add_git_hash(f_out)
-            #filename=os.path.basename(__file__)
-            #setattr(f_out,'script_used',filename)
+            setattr(f_out,'script_URL','https://github.com/crterai/Analysis/commit/')
+            filename=os.path.basename(__file__)
+            setattr(f_out,'script_used',filename)
+            #f_out=create_netcdfs.add_git_hash(f_out)
 
             f_in1.close()
             f_out.close()
