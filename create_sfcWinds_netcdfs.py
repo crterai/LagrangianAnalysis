@@ -25,9 +25,10 @@ import create_netcdfs
 #derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
 #year='2010'
 
-model_output_location='/global/cscratch1/sd/terai/UP/archive/longcam5I_L30_20081001_00Z_f09_g16_1024/atm/hist/'
-model_prefix='longcam5I_L30_20081001_00Z_f09_g16_1024'
-derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg/'
+model_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/'
+
+model_prefix='longcam5I_L30_20081001_0Z_f09_g16_828'
+derived_output_location='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run2/sfcWinds/'
 year='2009'
 
 #months=['09']

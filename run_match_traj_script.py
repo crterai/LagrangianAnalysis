@@ -14,7 +14,7 @@ import numpy as np
 from durolib import globalAttWrite,writeToLog,trimModelList
 from socket import gethostname
 import pandas
-from match_traj_parallelized_general_library import match_traj_parallelized_general,match_traj_parallelized_general_NoAnom,match_traj_parallelized_windSST
+from match_traj_parallelized_general_library import match_traj_parallelized_general
 
 Start_index=int(sys.argv[1])
 #End_index=Start_index+2500   #Add 2500 to get the End_index (this 2500 is an arbritary choice and can be modified)
