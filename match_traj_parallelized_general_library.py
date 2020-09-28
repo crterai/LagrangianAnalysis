@@ -9,9 +9,9 @@ import MV2 as MV     #stuff for dealing with masked values.
 import cdutil as cdu
 import glob
 import os
-from string import replace
+#from string import replace
 import numpy as np
-from durolib import globalAttWrite,writeToLog,trimModelList
+#from durolib import globalAttWrite,writeToLog,trimModelList
 from socket import gethostname
 import pandas
 
@@ -556,5 +556,114 @@ def match_traj_parallelized_precip(Start_index,End_index):
         # Save the table into a text file with 6 significant digits
         np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectoryv4_precip_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')
         np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectoryv4_raw_precip_',str(Start_index),'_',str(End_index),'.txt']),Output_table_raw,delimiter=',  ',fmt='%.5e')
+
+def match_traj_parallelized_PRECC(Start_index,End_index):
+        """
+        Takes the start index of a table with trajectory times and locations and prints out the precip at those locations and times in a txt file with name CAM5_trajectory_precip_STARTINDEX_ENDINDEX.txt
+        Outputs both raw values and anomalies wrt to 100 day mean
+        """
+        trajectory_file='~/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectories_v2.dms'    #trajectory file is already specified in this case
+        # open table with trajectory times and location
+        Traj_table=pandas.read_table(trajectory_file,sep='\s+')  
+        Traj_table_array=np.array(Traj_table[0:])
+        
+        # For regridding - take grid from GPCPv1pt2
+        f_gpcp=cdm.open('~/Obs_datasets/GPCP_PDF/GPCPv1pt2_PREC_pdf.nc')
+        obs_freq_pdf=f_gpcp('PRECFREQPDF')
+        gpcp_grid=obs_freq_pdf.getGrid()
+        
+        
+        f_log=open("".join(["log_traj_precip_",str(Start_index),"_",str(End_index),".txt"]),"w+")
+        #length_traj_table=Traj_table_array.shape[0]
+        length_traj_table=End_index-Start_index
+        Output_table=np.zeros((length_traj_table,8)) # Create table to output data
+        Output_table_raw=np.zeros((length_traj_table,8)) # Create table to output data
+        Output_table[:,:]=np.nan                      # Set all data to nan
+        Output_table_raw[:,:]=np.nan
+        start_index=Start_index
+        for i in np.arange(start_index,End_index):   #loop from start to end index
+            #print i
+            Output_table[i-start_index,0]=int(Traj_table_array[i,0]) #write the traj number
+            Output_table_raw[i-start_index,0]=int(Traj_table_array[i,0]) #write the traj number
+            #In a log file, keep track of what trajectories get analyzed
+            f_log=open("".join(["log_traj_precip_",str(Start_index),"_",str(End_index),".txt"]),"a")
+            f_log.write("".join([str(int(Traj_table_array[i,0]))," \n"]))
+            f_log.close()
+            for j in np.arange(7):   #loop across the 7 instances along trajectory
+                #Retrieve days after 2008-12-31 and time in UTC
+                Day0=Traj_table_array[i,2+j]
+                Time0=Traj_table_array[i,9+j]
+                # Add exception when Time is 24 hrs = 0 hrs the next day
+                if Time0>=24:
+                    Day0=Traj_table_array[i,2+j]+1
+                relday0=cdu.cdtime.reltime(Day0,"days since 2008-12-31")
+                comptime0=cdu.cdtime.r2c(relday0)
+                str_comptime0month=str(comptime0.month)
+                str_comptime0day=str(comptime0.day)
+                if ~(Day0>0):
+                    continue   #Skip cases where the date or time is NaN
+                if comptime0.month<10:   #Add zero to single digit months
+                    str_comptime0month=''.join(['0',str(comptime0.month)])
+                if comptime0.day<10:     #Add zero to single digit days
+                    str_comptime0day=''.join(['0',str(comptime0.day)])
+                str_day=''.join(['2009-',str_comptime0month,'-',str_comptime0day])
+                #Decide which file to access based on time of day
+                if Time0<6:
+                    str_time0='00000'
+                    time_index0=np.floor(Time0)
+                if Time0>=6 and Time0<12:
+                    str_time0='21600'
+                    time_index0=np.floor(Time0)-6
+                if Time0>=12 and Time0<18:
+                    str_time0='43200'
+                    time_index0=np.floor(Time0)-12
+                if Time0>=18 and Time0<24:
+                    str_time0='64800'
+                    time_index0=np.floor(Time0)-18
+                if Time0>=24:
+                    str_time0='00000'
+                    time_index0=0
+                str_time=''.join([str_day,'-',str_time0])
+                filelocation='/global/cscratch1/sd/terai/UP_analysis/Eastman_analysis/CAM5_1deg_run3/'
+                fileprefix='longcam5I_L30_20081001_0Z_f09_g16_NEW_828.cam.h1.'
+                # Access the dataset using cdms2 tools
+                f_PRECT=cdm.open(''.join([filelocation,fileprefix,str_time,'.nc']))
+                time_index0=int(time_index0)  #Convert any decimals to integer to index
+                lat0=Traj_table_array[i,16+j] #Locate the latitude from the trajectory table
+                lon0=Traj_table_array[i,23+j]
+                # Take the time slice and box with 5 x 5 deg. around interested area
+                PRECC_grid=f_PRECT('PRECC',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                # Regrid the data to 1x1 deg boxes using the grid from GPCP (see above)
+                PRECT_regridded=PRECC_grid.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+                # Take the value from the grid box that lies within 1deg box around the point
+                PRECT=PRECT_regridded(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                PRECT_array=np.array(cdu.averager(PRECT,axis='xyt'))
+                # Set all very small values of zeros to NaNs
+                if PRECT_array<-999:
+                    PRECT_array=np.nan
+                
+                ## ********  Repeat the steps above for the 100-day mean data
+                #f_PRECT_100dm=cdm.open(''.join([filelocation,'AVG100days_PRECT_',fileprefix,str_time,'.nc']))
+                ## Take the time slice and box with 5 x 5 deg. around interested area
+                #PRECT_grid_100dm=f_PRECT_100dm('PRECT',time=slice(time_index0,time_index0+1),lat=(lat0-5,lat0+5),lon=(lon0-5,lon0+5))
+                ## Regrid the data to 1x1 deg boxes using the grid from GPCP (see above)
+                #PRECT_regridded_100dm=PRECT_grid_100dm.regrid(gpcp_grid,regridTool='esmf',regridMethod='bilinear')
+                ## Take the value from the grid box that lies within 1deg box around the point
+                #try:
+                #    PRECT_100dm=PRECT_regridded_100dm(lat=(lat0-0.5,lat0+0.5),lon=(lon0-0.5,lon0+0.5))
+                #except:
+                #    PRECT_100dm=PRECT_regridded_100dm(lat=(lat0-0.5,lat0+0.6),lon=(lon0-0.5,lon0+0.6))
+                #PRECT_100dm_array=np.array(cdu.averager(PRECT_100dm,axis='xyt'))
+
+                ## **************************************************************
+
+                ## Enter values into the new output table
+                #Output_table[i-start_index,j+1]=PRECT_array-PRECT_100dm_array
+                Output_table_raw[i-start_index,j+1]=PRECT_array
+        np.set_printoptions(precision=5)
+        f_PRECT.close()
+        # Save the table into a text file with 6 significant digits
+        #np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectoryv4_precc_',str(Start_index),'_',str(End_index),'.txt']),Output_table,delimiter=',  ',fmt='%.5e')
+        np.savetxt(''.join(['/global/homes/t/terai/UP_analysis/Eastman_analysis/Analysis/CAM5_trajectoryv4_raw_precc_',str(Start_index),'_',str(End_index),'.txt']),Output_table_raw,delimiter=',  ',fmt='%.5e')
 
 
