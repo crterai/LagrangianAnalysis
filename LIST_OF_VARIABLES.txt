@@ -5,10 +5,11 @@ Variables with an hourly output frequency
 Local time
 Total cloud cover
 Height-resolved cloud cover
-LWP
+LWP (in-cloud and total grid)
 SST
-Height-resolved temperature and humidity (for estimating inversion height and strength)
+Height-resolved temperature and humidity (for estimating inversion height and strength, 700hPa humidity, lower tropospheric stability)
 Height-resolved vertical velocity (omega)
-Lower troposphere horizontal winds (or at the surface?)
-Surface precipitation rate (do I need something more height resolved?)
-Cloud droplet number concentration (to retrieve cloud top Nd)
+Lower troposphere horizontal winds (at 925hPa)
+10-m wind speeds
+Surface precipitation rate
+Height resolved cloud droplet number concentration (to retrieve cloud top Nd)
